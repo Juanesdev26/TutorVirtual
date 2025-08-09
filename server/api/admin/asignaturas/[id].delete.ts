@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { defineEventHandler, getRouterParam, createError } from "h3";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id"); // ✅ Corrección clave

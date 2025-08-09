@@ -1,8 +1,7 @@
 // server/api/asignaturas/[id].delete.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { H3Event, defineEventHandler } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const id = event.context.params?.id;

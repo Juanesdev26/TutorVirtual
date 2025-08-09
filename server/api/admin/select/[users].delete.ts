@@ -1,8 +1,7 @@
 // server/api/admin/[users].delete.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { H3Event, defineEventHandler, readBody } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   // Explicitly type the event parameter

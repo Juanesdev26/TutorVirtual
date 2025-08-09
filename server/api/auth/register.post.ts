@@ -1,9 +1,9 @@
 // server/api/auth/register.post.ts
-import { PrismaClient, Rol } from "@prisma/client";
+import prisma from "~/lib/prisma";
+import { Rol } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { defineEventHandler, readBody, createError } from "h3";
 
-const prisma = new PrismaClient();
 
 interface RegisterBody {
   email: string;
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
 
   // Validación de entrada
   if (!email || !password || !role || !documentoIdentidad || !nombre) {
-    return createError({
+    throw createError({
       statusCode: 400,
       message: "Todos los campos son obligatorios excepto el teléfono.",
     });
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 
   // Rechazar intentos de registro con rol "ESTUDIANTE"
   if (role === "ESTUDIANTE") {
-    return createError({
+    throw createError({
       statusCode: 400,
       message: "No se permite el registro directo de estudiantes.",
     });
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     });
 
     if (existingUser) {
-      return createError({
+      throw createError({
         statusCode: 400,
         message:
           "Ya existe un usuario con este correo o documento de identidad.",
@@ -75,17 +75,15 @@ export default defineEventHandler(async (event) => {
     console.error("Error de registro:", error);
 
     if (error instanceof Error) {
-      return createError({
+      throw createError({
         statusCode: 500,
         message: `Error interno del servidor: ${error.message}`,
       });
     } else {
-      return createError({
+      throw createError({
         statusCode: 500,
         message: "Error interno del servidor: Ocurrió un error desconocido.",
       });
     }
-  } finally {
-    await prisma.$disconnect();
   }
 });

@@ -1,9 +1,8 @@
 // server/api/admin/[users].put.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import * as bcrypt from "bcrypt";
 import { H3Event, defineEventHandler, readBody } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);

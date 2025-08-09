@@ -79,6 +79,8 @@
 </template>
 
 <script>
+import { createClient } from '@supabase/supabase-js'
+
 export default {
   props: {
     idAsignatura: {
@@ -94,9 +96,13 @@ export default {
       error: null,
       materiales: [],
       deleting: null,
+      supabase: null,
     };
   },
   mounted() {
+    const supabaseUrl = process.env.NUXT_PUBLIC_SUPABASE_URL
+    const supabaseAnon = process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY
+    this.supabase = createClient(supabaseUrl, supabaseAnon)
     this.fetchMateriales();
   },
   methods: {
@@ -115,26 +121,40 @@ export default {
       }
     },
     async uploadFile() {
-      if (!this.selectedFile) return;
+      if (!this.selectedFile || !this.supabase) return;
       this.uploading = true;
       this.success = false;
       this.error = null;
-      const formData = new FormData();
-      formData.append('file', this.selectedFile);
-      formData.append('idAsignatura', this.idAsignatura.toString());
       try {
-        const response = await fetch('/api/files/upload', {
+        const fileName = `${Date.now()}-${this.selectedFile.name}`
+        const { data, error } = await this.supabase.storage
+          .from('files')
+          .upload(fileName, this.selectedFile, { upsert: true, contentType: this.selectedFile.type })
+        if (error) throw error
+
+        const { data: publicUrlData } = this.supabase.storage.from('files').getPublicUrl(data.path)
+        const publicUrl = publicUrlData.publicUrl
+
+        // Guardar metadatos en la base de datos
+        const res = await fetch('/api/materials', {
           method: 'POST',
-          body: formData,
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al subir el archivo.');
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idAsignatura: this.idAsignatura,
+            nombre: this.selectedFile.name,
+            tipo: this.selectedFile.type || 'application/octet-stream',
+            url: publicUrl,
+          })
+        })
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}))
+          throw new Error(e.message || 'Error al registrar el material')
         }
+
         this.success = true;
         await this.fetchMateriales();
       } catch (err) {
-        this.error = err.message;
+        this.error = err.message || 'Error de subida'
       } finally {
         this.uploading = false;
       }

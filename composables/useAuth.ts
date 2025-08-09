@@ -8,7 +8,7 @@ interface AuthResponse {
 }
 
 interface User {
-  email: string
+  email?: string
   role: string
   id: number
 }
@@ -38,22 +38,18 @@ export const useAuth = () => {
         body: { email, password },
       })
 
-      // Decodificar el token para obtener la información del usuario
-      const decodedToken = jwtDecode<{ userId: number; role: string; email: string }>(response.token)
+      const decodedToken = jwtDecode<{ userId: number; role: string; email?: string }>(response.token)
 
-      // Almacenar datos de autenticación
       token.value = response.token
       user.value = {
-        email: decodedToken.email,
+        email: decodedToken.email ?? email,
         role: decodedToken.role,
         id: decodedToken.userId,
       }
 
-      // Guardar en localStorage
       localStorage.setItem("token", response.token)
       localStorage.setItem("user", JSON.stringify(user.value))
 
-      // Redirigir basado en el rol
       redirectBasedOnRole(response.role)
 
       return response
@@ -130,37 +126,7 @@ export const useAuth = () => {
   }
 
   // Nueva función para refrescar el token
-  const refreshToken = async () => {
-    try {
-      const response = await $fetch<AuthResponse>("/api/auth/refresh", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-      })
-
-      // Decodificar el nuevo token
-      const decodedToken = jwtDecode<{ userId: number; role: string; email: string }>(response.token)
-
-      // Actualizar el token y la información del usuario
-      token.value = response.token
-      user.value = {
-        email: decodedToken.email,
-        role: decodedToken.role,
-        id: decodedToken.userId,
-      }
-
-      localStorage.setItem("token", response.token)
-      localStorage.setItem("user", JSON.stringify(user.value))
-
-      return response.token
-    } catch (error) {
-      console.error("Error al refrescar el token:", error)
-      // Si falla el refresh, limpiamos el token y el usuario
-      logout()
-      throw error
-    }
-  }
+  // Eliminada: el endpoint /api/auth/refresh no existe actualmente.
 
   // Inicializar el estado de autenticación cuando se usa el composable
   if (process.client) {
@@ -175,6 +141,5 @@ export const useAuth = () => {
     logout,
     isAuthenticated,
     getUserRole,
-    refreshToken,
   }
 }

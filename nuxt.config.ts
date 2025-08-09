@@ -1,5 +1,3 @@
-import { theme } from "#tailwind-config";
-
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
@@ -37,8 +35,8 @@ export default defineNuxtConfig({
     geminiApiKey: process.env.GEMINI_API_KEY,
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "/api",
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_KEY,
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
+      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
     },
   },
   app: {
@@ -59,20 +57,21 @@ export default defineNuxtConfig({
   vite: {
     build: {
       cssMinify: "esbuild",
-      minify: "terser",
-      terserOptions: {
-        compress: {
-          drop_console: process.env.NODE_ENV === "production",
-          drop_debugger: process.env.NODE_ENV === "production",
-        },
-        format: {
-          comments: false, // Eliminar todos los comentarios
-        },
-      },
+      minify: "esbuild",
+      // terserOptions are ignored when using esbuild; keeping minimal terser config commented
+      // terserOptions: {
+      //   compress: {
+      //     drop_console: process.env.NODE_ENV === "production",
+      //     drop_debugger: process.env.NODE_ENV === "production",
+      //   },
+      //   format: {
+      //     comments: false,
+      //   },
+      // },
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ["vue", "pinia", "supabase"],
+            vendor: ["vue", "vue-router", "@supabase/supabase-js"],
             prisma: ["@prisma/client"],
           },
         },
@@ -105,13 +104,7 @@ export default defineNuxtConfig({
     minify: true,
     routeRules: {
       "/api/": {
-        cors: true,
-        headers: {
-          "Access-Control-Allow-Methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": "true",
-          "Access-Control-Allow-Headers": "*",
-        },
+        cors: true
       },
       "/api/news": { swr: 1800 },
     },
@@ -124,8 +117,8 @@ export default defineNuxtConfig({
     transpile: ["@google/generative-ai", "cookie"],
   },
   tailwindcss: {
-    configPath: "~/tailwind.config.ts",
-    exposeConfig: false, // Desactivar si no se necesita
-    viewer: false, // Desactivar en producción
-  },
+    configPath: "~/tailwind.config.js",
+    exposeConfig: true,
+    viewer: false,
+  },
 });

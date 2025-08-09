@@ -1,8 +1,7 @@
 // server/api/asignaturas/[id].get.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { H3Event, defineEventHandler } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const id = Number(event.context.params?.id);
@@ -33,7 +32,5 @@ export default defineEventHandler(async (event: H3Event) => {
       statusCode: 500,
       message: "Error obteniendo la asignatura",
     });
-  } finally {
-    await prisma.$disconnect();
   }
 });

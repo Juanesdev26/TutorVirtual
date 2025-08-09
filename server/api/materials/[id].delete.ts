@@ -1,11 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
+  process.env.NUXT_PUBLIC_SUPABASE_URL!,
+  process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const idParam = event.context.params?.id;

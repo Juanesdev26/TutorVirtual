@@ -1,10 +1,9 @@
 // server/api/auth/login.post.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { defineEventHandler, readBody, createError } from "h3";
 
-const prisma = new PrismaClient();
 
 interface LoginRequest {
   email: string;
@@ -32,13 +31,13 @@ export default defineEventHandler(async (event) => {
         usuario.contrasena
       );
       if (!isPasswordValid) {
-        return createError({
+        throw createError({
           statusCode: 401,
           message: "Invalid credentials",
         });
       }
       const token = jwt.sign(
-        { userId: usuario.id, role: usuario.rol },
+        { userId: usuario.id, role: usuario.rol, email },
         process.env.JWT_SECRET || "fallback_secret",
         { expiresIn: "1h" }
       );
@@ -61,26 +60,26 @@ export default defineEventHandler(async (event) => {
         estudiante.contrasena
       );
       if (!isPasswordValid) {
-        return createError({
+        throw createError({
           statusCode: 401,
           message: "Invalid credentials",
         });
       }
       const token = jwt.sign(
-        { userId: estudiante.id, role: "ESTUDIANTE", asignaturaId: estudiante.asignaturaId },
+        { userId: estudiante.id, role: "ESTUDIANTE", asignaturaId: estudiante.asignaturaId, email },
         process.env.JWT_SECRET || "fallback_secret",
         { expiresIn: "1h" }
       );
       return { token, role: "ESTUDIANTE", asignaturaId: estudiante.asignaturaId, userId: estudiante.id }; // Devuelve el userId
     }
 
-    return createError({
+    throw createError({
       statusCode: 401,
       message: "Invalid credentials",
     });
   } catch (error) {
     console.error("Login error:", error);
-    return createError({
+    throw createError({
       statusCode: 500,
       message: "Internal server error",
     });

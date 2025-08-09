@@ -1,8 +1,7 @@
 // server/api/students/activities.get.ts
 import { defineEventHandler } from "h3";
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {

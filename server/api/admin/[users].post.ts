@@ -1,9 +1,9 @@
 // server/api/admin/[users].post.ts
-import { PrismaClient, Rol } from "@prisma/client";
+import prisma from "~/lib/prisma";
+import { Rol } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { H3Event, defineEventHandler, readBody } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 interface CreateDocenteBody {
   documentoIdentidad: string;
@@ -53,17 +53,15 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Manejar errores de Prisma (por ejemplo, correo duplicado)
     if (error instanceof Error) {
-      return createError({
+      throw createError({
         statusCode: 500,
         message: `Error al crear el docente: ${error.message}`,
       });
     } else {
-      return createError({
+      throw createError({
         statusCode: 500,
         message: "Error desconocido al crear el docente.",
       });
     }
-  } finally {
-    await prisma.$disconnect();
   }
 });

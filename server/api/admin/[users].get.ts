@@ -1,8 +1,8 @@
 // server/api/admin/[users].get.ts
-import { PrismaClient, Rol } from "@prisma/client";
+import prisma from "~/lib/prisma";
+import { Rol } from "@prisma/client";
 import { H3Event, defineEventHandler, getQuery } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const query = getQuery(event);

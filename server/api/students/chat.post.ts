@@ -5,7 +5,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import axios from 'axios'
 
 // Inicializar Prisma y Google AI
-const prisma = new PrismaClient()
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 // Configuración del modelo

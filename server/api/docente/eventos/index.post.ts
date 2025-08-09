@@ -1,5 +1,6 @@
 // server/api/docente/eventos/index.post.ts
-import { PrismaClient, Rol } from "@prisma/client";
+import prisma from "~/lib/prisma";
+import { Rol } from "@prisma/client";
 import {
   defineEventHandler,
   createError,
@@ -9,7 +10,6 @@ import {
 } from "h3";
 import jwt from "jsonwebtoken";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
@@ -142,7 +142,5 @@ export default defineEventHandler(async (event: H3Event) => {
         message: "Error desconocido al crear el recordatorio",
       });
     }
-  } finally {
-    await prisma.$disconnect();
   }
 });

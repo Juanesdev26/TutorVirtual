@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { defineEventHandler } from "h3";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async () => {
   const [studentsCount, subjectsCount] = await Promise.all([

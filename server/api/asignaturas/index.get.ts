@@ -1,9 +1,8 @@
 // server/api/asignaturas/index.get.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { defineEventHandler, createError, getHeader } from "h3";
 import jwt from "jsonwebtoken";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   // Verificar token en el encabezado

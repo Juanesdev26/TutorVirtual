@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import {
   H3Event,
   defineEventHandler,
@@ -8,7 +8,6 @@ import {
 } from "h3";
 import jwt from "jsonwebtoken";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);

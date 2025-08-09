@@ -1,8 +1,7 @@
 // server/api/docente/eventos/[id].delete.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { defineEventHandler, createError } from "h3";
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {

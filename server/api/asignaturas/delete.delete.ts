@@ -1,8 +1,7 @@
 // server/api/asignaturas/delete.delete.ts
-import { PrismaClient } from "@prisma/client";
+import prisma from "~/lib/prisma";
 import { H3Event, defineEventHandler, readBody } from "h3"; // Import the necessary functions
 
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event: H3Event) => {
   const body = await readBody(event);
@@ -24,11 +23,9 @@ export default defineEventHandler(async (event: H3Event) => {
     };
   } catch (error) {
     console.error("Error eliminando la asignatura:", error);
-    return createError({
+    throw createError({
       statusCode: 500,
       message: "Error eliminando la asignatura",
     });
-  } finally {
-    await prisma.$disconnect();
   }
 });
